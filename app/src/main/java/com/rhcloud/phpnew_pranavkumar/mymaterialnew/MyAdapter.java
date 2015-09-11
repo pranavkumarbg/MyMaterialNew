@@ -1,15 +1,21 @@
 package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
@@ -46,12 +52,38 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         {
             final String url = feedItemList.get(position).getThumbnail();
 
-            YoYo.with(Techniques.Pulse)
-                    .duration(1000)
-                    .playOn(holder.placeImage);
-            Glide.with(mContext).load(url).centerCrop().into(holder.placeImage);
+//            YoYo.with(Techniques.Pulse)
+//                    .duration(1000)
+//                    .playOn(holder.placeImage);
+            //Glide.with(mContext).load(url).centerCrop().into(holder.placeImage);
+
+            Glide.with(mContext)
+                    .load(url)
+                    .asBitmap()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .thumbnail(0.1f)
+                .into(new BitmapImageViewTarget(holder.placeImage) {
+
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
+                        super.onResourceReady(resource, glideAnimation);
 
 
+                        YoYo.with(Techniques.Pulse)
+                                .duration(1000)
+                                .playOn(holder.placeImage);
+                        Palette.generateAsync(resource, new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(Palette palette) {
+
+                                int mutedLight = palette.getVibrantColor(mContext.getResources().getColor(android.R.color.black));
+                                holder.placeNameHolder.setBackgroundColor(mutedLight);
+                            }
+                        });
+
+                        holder.progressBar.setVisibility(View.GONE);
+                    }
+                });
 
 
         }
@@ -76,13 +108,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public LinearLayout placeNameHolder;
         public TextView placeName;
         public ImageView placeImage;
-
+        ProgressBar progressBar;
         public ViewHolder(View itemView) {
             super(itemView);
+
             placeHolder = (LinearLayout) itemView.findViewById(R.id.mainHolder);
             placeName = (TextView) itemView.findViewById(R.id.placeName);
             placeNameHolder = (LinearLayout) itemView.findViewById(R.id.placeNameHolder);
             placeImage = (ImageView) itemView.findViewById(R.id.placeImage);
+            progressBar=(ProgressBar)itemView.findViewById(R.id.image_details_loader_new);
             placeHolder.setOnClickListener(this);
 
         }

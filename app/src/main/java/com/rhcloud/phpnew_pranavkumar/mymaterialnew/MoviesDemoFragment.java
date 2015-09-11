@@ -10,17 +10,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Pranav on 9/2/2015.
@@ -34,7 +34,8 @@ public class MoviesDemoFragment extends Fragment {
     JSONArray jsonarray;
     String b;
     String json;
-    private ArrayList<FeedItem> feedItemList = new ArrayList<FeedItem>();
+    MovieData item;
+    private ArrayList<MovieData> feedMovieList = new ArrayList<MovieData>();
 
     public MoviesDemoFragment() {
 
@@ -47,6 +48,8 @@ public class MoviesDemoFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+
 
     @Nullable
     @Override
@@ -64,13 +67,44 @@ public class MoviesDemoFragment extends Fragment {
 
         View layout = inflater.inflate(R.layout.fragment_movie, container, false);
 
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Movies");
+        query.whereExists("url");
+        query.whereExists("thumbnail");
+        query.whereExists("movie");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+
+                    if (list.size() > 0) {
+
+                        for (int i = 0; i < list.size(); i++) {
+                            ParseObject p = list.get(i);
+                            String urlget = p.getString("url");
+                            String thumb = p.getString("thumbnail");
+                            String name = p.getString("movie");
+//                                    Toast.makeText(getActivity(), urlget, Toast.LENGTH_LONG).show();
+//                                    Toast.makeText(getActivity(), thumb, Toast.LENGTH_LONG).show();
+//                                    Toast.makeText(getActivity(), name, Toast.LENGTH_LONG).show();
+                            item = new MovieData();
+
+                            item.setMovieurl(urlget);
+                            item.setMoviethumbnail(thumb);
+                            item.setMoviename(name);
+
+                            feedMovieList.add(item);
+                        }
+
+                    }
+
+                } else {
+                    Log.d("score", "Error: " + e.getMessage());
+                }
+            }
+        });
 
 
-        // textView=(TextView)layout.findViewById(R.id.textView3);
-
-        // textView.setText("hi 3");
-
-        new DownloadJSON().execute();
+       // new DownloadJSON().execute();
 
         mRecyclerView = (RecyclerView) layout.findViewById(R.id.recyclerviewk);
         mRecyclerView.setHasFixedSize(true);
@@ -81,6 +115,9 @@ public class MoviesDemoFragment extends Fragment {
         // StaggeredGridLayoutManager mLayoutManager1 = new StaggeredGridLayoutManager(2,1);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        mAdapter = new MovieAdapter(getActivity(), feedMovieList);
+
+        mRecyclerView.setAdapter(mAdapter);
 
         return layout;
     }
@@ -103,35 +140,19 @@ public class MoviesDemoFragment extends Fragment {
         public String doInBackground(String... params) {
 
 
-            //  String json = JSONfunctions.getJSONfromURL("http://newjson-pranavkumar.rhcloud.com/GridViewJson");
-
-            OkHttpClient okHttpClient = new OkHttpClient();
-            Request request = new Request.Builder().url("http://newjson-pranavkumar.rhcloud.com/GridViewJson")
-                    .build();
 
 
             try {
-                Response response = okHttpClient.newCall(request).execute();
-
-                json = response.body().string();
 
 
-                JSONObject reader = new JSONObject(json);
-                jsonarray = reader.getJSONArray("images");
 
-                for (int i = 0; i < jsonarray.length(); i++) {
 
-                    jsonobject = jsonarray.getJSONObject(i);
+               // feedMovieList.add(item);
 
-                    FeedItem item = new FeedItem();
 
-                    item.setThumbnail(jsonobject.optString("image"));
-                    feedItemList.add(item);
 
-                }
-            } catch (JSONException e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
+
+
             } catch (Exception e) {
 
             }
@@ -141,19 +162,19 @@ public class MoviesDemoFragment extends Fragment {
         @Override
         protected void onPostExecute(String args) {
 
-            if (args != null && !args.isEmpty()) {
+           // if (args != null && !args.isEmpty()) {
 
-                mAdapter = new MovieAdapter(getActivity(), feedItemList);
+//                mAdapter = new MovieAdapter(getActivity(), feedMovieList);
+//
+//                mRecyclerView.setAdapter(mAdapter);
 
-                mRecyclerView.setAdapter(mAdapter);
 
-
-            }
-            else
-            {
-                Toast.makeText(getActivity(), "no internet or server is down", Toast.LENGTH_LONG).show();
-
-            }
+//            }
+//            else
+//            {
+//                Toast.makeText(getActivity(), "no internet or server is down", Toast.LENGTH_LONG).show();
+//
+//            }
 
 
         }

@@ -6,7 +6,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity" >
+    tools:context=".LoginActivity"
+    >
 
     <EditText
         android:id="@+id/usernameField"
@@ -46,5 +47,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="69dp"
         android:text="@string/sign_up_text" />
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarlog"
+        android:progressDrawable="@drawable/circular_progress_bar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

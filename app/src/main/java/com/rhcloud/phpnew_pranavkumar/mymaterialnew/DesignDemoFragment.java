@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -28,12 +29,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import at.grabner.circleprogress.CircleProgressView;
+
 /**
  * Created by Pranav on 9/1/2015.
  */
 public class DesignDemoFragment extends Fragment {
     private static final String TAB_POSITION = "tab_position";
     RecyclerView mRecyclerView;
+    ProgressBar progressBar;
     private StaggeredGridLayoutManager mStaggeredLayoutManager;
     RecyclerView.LayoutManager mLayoutManager;
     MyAdapter mAdapter;
@@ -44,6 +48,7 @@ public class DesignDemoFragment extends Fragment {
     SpacesItemDecoration decoration;
     private boolean isListView;
     private ArrayList<FeedItem> feedItemList = new ArrayList<FeedItem>();
+    CircleProgressView mCircleView;
 
     public DesignDemoFragment() {
 
@@ -73,9 +78,13 @@ public class DesignDemoFragment extends Fragment {
 
         View layout = inflater.inflate(R.layout.fragment_grid_view, container, false);
 
-        // textView=(TextView)layout.findViewById(R.id.textView3);
-
-        // textView.setText("hi 3");
+        progressBar=(ProgressBar)layout.findViewById(R.id.progressBar2);
+//        mCircleView = (CircleProgressView)layout. findViewById(R.id.circleView);
+//        mCircleView.spin();
+//        mCircleView.setMaxValue(100);
+//        mCircleView.setValue(0);
+//        mCircleView.setValueAnimated(24);
+        progressBar.setVisibility(View.GONE);
         decoration = new SpacesItemDecoration(16);
         new DownloadJSON().execute();
 
@@ -99,11 +108,12 @@ public class DesignDemoFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public String doInBackground(String... params) {
+
 
 
             //  String json = JSONfunctions.getJSONfromURL("http://newjson-pranavkumar.rhcloud.com/GridViewJson");
@@ -149,6 +159,9 @@ public class DesignDemoFragment extends Fragment {
                 mAdapter = new MyAdapter(getActivity(), feedItemList);
 
                 mRecyclerView.setAdapter(mAdapter);
+
+                //mCircleView.stopSpinning();
+                progressBar.setVisibility(View.GONE);
                // mRecyclerView.addItemDecoration(decoration);
                 mAdapter.setOnItemClickListener(onItemClickListener);
 
@@ -182,9 +195,11 @@ public class DesignDemoFragment extends Fragment {
 // 3
            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
                    imagePair, holderPair);
+
            ActivityCompat.startActivity(getActivity(), transitionIntent, options.toBundle());
        }
    };
+
 
 
 }

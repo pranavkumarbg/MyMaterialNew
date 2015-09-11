@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -25,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 
 public class SignupActivity extends Activity {
 
+    ProgressBar progressBar;
     protected EditText mUsername;
     protected EditText mPassword;
     protected EditText mEmail;
@@ -34,20 +36,22 @@ public class SignupActivity extends Activity {
     String email;
     String imgDecodableString;
     ParseFile file;
-
+    Boolean b=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-
+        progressBar=(ProgressBar)findViewById(R.id.progressBarsgn);
         mUsername = (EditText)findViewById(R.id.usernameField);
         mPassword = (EditText)findViewById(R.id.passwordField);
         mEmail = (EditText)findViewById(R.id.emailField);
         mSignUpButton = (Button)findViewById(R.id.signupButton);
         mUpload=(Button)findViewById(R.id.buttonu);
+        progressBar.setVisibility(View.GONE);
         mUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 // Start the Intent
@@ -61,12 +65,13 @@ public class SignupActivity extends Activity {
                 username = mUsername.getText().toString();
                 password = mPassword.getText().toString();
                 email = mEmail.getText().toString();
-
+                progressBar.setVisibility(View.VISIBLE);
                 username = username.trim();
                 password = password.trim();
                 email = email.trim();
 
-                if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+                if (username.isEmpty() || password.isEmpty() || email.isEmpty() || imgDecodableString==null) {
+                    progressBar.setVisibility(View.GONE);
                     AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this);
                     builder.setMessage(R.string.signup_error_message)
                             .setTitle(R.string.signup_error_title)
@@ -91,12 +96,12 @@ public class SignupActivity extends Activity {
                     file.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if(null == e) {
+                            if(null == e&&file!=null) {
                                 savetoParse();
                             }
                             else
                             {
-
+                                Toast.makeText(getApplication(),"upload photo",Toast.LENGTH_LONG).show();
                             }
                         }
                     });
@@ -159,14 +164,16 @@ public class SignupActivity extends Activity {
         newUser.signUpInBackground(new SignUpCallback() {
             @Override
             public void done(ParseException e) {
-                if (e == null) {
+                if (e == null&&b==true) {
                     // Success!
                     Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    progressBar.setVisibility(View.GONE);
                 }
                 else {
+                    progressBar.setVisibility(View.GONE);
                     AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this);
                     builder.setMessage(e.getMessage())
                             .setTitle(R.string.signup_error_title)
@@ -181,6 +188,7 @@ public class SignupActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
+            //progressBar.setVisibility(View.VISIBLE);
             // When an Image is picked
             if (requestCode == 0 && resultCode == RESULT_OK
                     && null != data) {
@@ -198,6 +206,8 @@ public class SignupActivity extends Activity {
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                 imgDecodableString = cursor.getString(columnIndex);
                 cursor.close();
+                b=true;
+               // progressBar.setVisibility(View.GONE);
                // ImageView imgView = (ImageView) findViewById(R.id.imgView);
                 // Set the Image in ImageView after decoding the String
 //                imgView.setImageBitmap(BitmapFactory

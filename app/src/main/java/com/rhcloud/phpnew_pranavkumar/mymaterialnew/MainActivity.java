@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     DesignDemoPagerAdapter adapter;
     TabLayout tabLayout;
     Toolbar toolbar;
+
     // Connection detector class
     ConnectionDetector cd;
 
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         ParseAnalytics.trackAppOpened(getIntent());
         cd = new ConnectionDetector(getApplicationContext());
         ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser.getClass();
         if (currentUser == null) {
 
             navigatToLogin();
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 //fab.setBackgroundResource(R.drawable.ic_place);
             }
         });
+
 
         adapter = new DesignDemoPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewpager);

@@ -10,12 +10,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
+
 /**
  * Created by Pranav on 9/6/2015.
  */
 public class ThirdActivity extends AppCompatActivity implements View.OnTouchListener{
 
     ImageView imageView;
+    private PhotoViewAttacher photoViewAttacher;
     // These matrices will be used to move and zoom image
     Matrix matrix = new Matrix();
     Matrix savedMatrix = new Matrix();
@@ -34,18 +39,26 @@ public class ThirdActivity extends AppCompatActivity implements View.OnTouchList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fabnew);
-        //imageView=(ImageView)findViewById(R.id.imageViewkk);
+        setContentView(R.layout.newsec);
+        imageView=(ImageView)findViewById(R.id.imageViewkk);
 
         Intent i = getIntent();
 
         String flag = i.getStringExtra("flaghh");
 
-       // Glide.with(this).load(flag).into(imageView);
+        Glide.with(this).load(flag).into(imageView);
+
+
+
+
 
 
 
         //imageView.setOnTouchListener(this);
+
+        photoViewAttacher = new PhotoViewAttacher(imageView);
+        photoViewAttacher.setZoomable(true);
+        photoViewAttacher.setScaleType(ImageView.ScaleType.FIT_CENTER);
     }
 
     @Override
