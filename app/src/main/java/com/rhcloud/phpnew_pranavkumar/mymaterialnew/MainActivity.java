@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         ParseAnalytics.trackAppOpened(getIntent());
         cd = new ConnectionDetector(getApplicationContext());
         ParseUser currentUser = ParseUser.getCurrentUser();
-        currentUser.getClass();
+        //currentUser.getClass();
         if (currentUser == null) {
 
             navigatToLogin();

@@ -1,5 +1,6 @@
 package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,13 +11,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -67,44 +73,7 @@ public class MoviesDemoFragment extends Fragment {
 
         View layout = inflater.inflate(R.layout.fragment_movie, container, false);
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Movies");
-        query.whereExists("url");
-        query.whereExists("thumbnail");
-        query.whereExists("movie");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (e == null) {
-
-                    if (list.size() > 0) {
-
-                        for (int i = 0; i < list.size(); i++) {
-                            ParseObject p = list.get(i);
-                            String urlget = p.getString("url");
-                            String thumb = p.getString("thumbnail");
-                            String name = p.getString("movie");
-//                                    Toast.makeText(getActivity(), urlget, Toast.LENGTH_LONG).show();
-//                                    Toast.makeText(getActivity(), thumb, Toast.LENGTH_LONG).show();
-//                                    Toast.makeText(getActivity(), name, Toast.LENGTH_LONG).show();
-                            item = new MovieData();
-
-                            item.setMovieurl(urlget);
-                            item.setMoviethumbnail(thumb);
-                            item.setMoviename(name);
-
-                            feedMovieList.add(item);
-                        }
-
-                    }
-
-                } else {
-                    Log.d("score", "Error: " + e.getMessage());
-                }
-            }
-        });
-
-
-       // new DownloadJSON().execute();
+        new DownloadJSON().execute();
 
         mRecyclerView = (RecyclerView) layout.findViewById(R.id.recyclerviewk);
         mRecyclerView.setHasFixedSize(true);
@@ -115,9 +84,7 @@ public class MoviesDemoFragment extends Fragment {
         // StaggeredGridLayoutManager mLayoutManager1 = new StaggeredGridLayoutManager(2,1);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new MovieAdapter(getActivity(), feedMovieList);
 
-        mRecyclerView.setAdapter(mAdapter);
 
         return layout;
     }
@@ -140,19 +107,37 @@ public class MoviesDemoFragment extends Fragment {
         public String doInBackground(String... params) {
 
 
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder().url("http://moviejson-pranavkumar.rhcloud.com/newmoviejson")
+                    .build();
 
 
             try {
+                Response response = okHttpClient.newCall(request).execute();
+
+                json = response.body().string();
 
 
+                JSONObject reader = new JSONObject(json);
+                jsonarray = reader.getJSONArray("movies");
+
+                for (int i = 0; i < jsonarray.length(); i++) {
+
+                    jsonobject = jsonarray.getJSONObject(i);
+
+                    MovieData item = new MovieData();
 
 
-               // feedMovieList.add(item);
+                    item.setMoviename(jsonobject.optString("moviename"));
+                    item.setMoviethumbnail(jsonobject.optString("thumbnail"));
+                    item.setMovieurl(jsonobject.optString("url"));
 
+                    feedMovieList.add(item);
 
-
-
-
+                }
+            } catch (JSONException e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
             } catch (Exception e) {
 
             }
@@ -162,22 +147,38 @@ public class MoviesDemoFragment extends Fragment {
         @Override
         protected void onPostExecute(String args) {
 
-           // if (args != null && !args.isEmpty()) {
+            if (args != null && !args.isEmpty()) {
 
-//                mAdapter = new MovieAdapter(getActivity(), feedMovieList);
-//
-//                mRecyclerView.setAdapter(mAdapter);
+                mAdapter = new MovieAdapter(getActivity(), feedMovieList);
 
+                mRecyclerView.setAdapter(mAdapter);
 
-//            }
-//            else
-//            {
-//                Toast.makeText(getActivity(), "no internet or server is down", Toast.LENGTH_LONG).show();
-//
-//            }
+                mAdapter.setOnItemClickListener(onItemClickListener);
+
+            }
+            else
+            {
+                Toast.makeText(getActivity(), "no internet or server is down", Toast.LENGTH_LONG).show();
+
+            }
 
 
         }
     }
+
+    MovieAdapter.OnItemClickListener onItemClickListener=new MovieAdapter.OnItemClickListener()
+    {
+
+        @Override
+        public void onItemClick(View view, int position) {
+            Intent transitionIntent = new Intent(getActivity(), NewMovie.class);
+            String url=feedMovieList.get(position).getMovieurl();
+            Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
+            transitionIntent.putExtra("flag", url);
+            startActivity(transitionIntent);
+            //Toast.makeText(getActivity(),"clicked"+position+url,Toast.LENGTH_LONG).show();
+
+        }
+    };
 }
 

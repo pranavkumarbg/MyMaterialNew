@@ -31,7 +31,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     private List<MovieData> feedMovieList = new ArrayList<MovieData>();
     private Context mContext;
-
+    OnItemClickListener mItemClickListener;
 
     public MovieAdapter(Context applicationContext, ArrayList<MovieData> feedMovieList) {
         this.feedMovieList = feedMovieList;
@@ -59,7 +59,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
             String name=feedMovieList.get(position).getMoviename();
 
-            Toast.makeText(mContext, url, Toast.LENGTH_LONG).show();
+           // Toast.makeText(mContext, url, Toast.LENGTH_LONG).show();
             holder.placeName.setText(name);
             //final PaletteTransformation paletteTransformation = new PaletteTransformation();
             final PaletteTransformation paletteTransformation = PaletteTransformation.getInstance();
@@ -116,7 +116,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return feedMovieList.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 
         public LinearLayout placeHolder;
@@ -132,13 +132,27 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             placeName = (TextView) itemView.findViewById(R.id.placeName);
             placeNameHolder = (LinearLayout) itemView.findViewById(R.id.placeNameHolder);
             placeImage = (ImageView) itemView.findViewById(R.id.placeImage);
-
+            placeImage.setOnClickListener(this);
 
 
         }
 
+        @Override
+        public void onClick(View view) {
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(itemView, getPosition());
+            }
+        }
     }
 
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
+    }
 
 }
 

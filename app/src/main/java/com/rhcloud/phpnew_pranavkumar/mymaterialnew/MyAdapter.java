@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
@@ -57,11 +58,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 //                    .playOn(holder.placeImage);
             //Glide.with(mContext).load(url).centerCrop().into(holder.placeImage);
 
+
+
             Glide.with(mContext)
                     .load(url)
                     .asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .thumbnail(0.1f)
+                   // .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    //.thumbnail(0.1f)
                 .into(new BitmapImageViewTarget(holder.placeImage) {
 
                     @Override
