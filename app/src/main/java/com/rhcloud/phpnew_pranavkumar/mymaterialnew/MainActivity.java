@@ -1,13 +1,23 @@
 package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -22,13 +32,22 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
+import com.rhcloud.phpnew_pranavkumar.mymaterialnew.data.MyContract;
+import com.rhcloud.phpnew_pranavkumar.mymaterialnew.gcm.QuickstartPreferences;
+import com.rhcloud.phpnew_pranavkumar.mymaterialnew.gcm.RegistrationIntentService;
+import com.rhcloud.phpnew_pranavkumar.mymaterialnew.sync.SyncAdapter;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
     private DrawerLayout mDrawerLayout;
@@ -46,41 +65,82 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     // Connection detector class
     ConnectionDetector cd;
+    Cursor c;
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final String TAG = "MainActivity";
+
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        Server API Key help
+//        AIzaSyBFKpI_76IDa0PsyuLy9JIExYCtFJSEHm8
+//        Sender ID help
+//        82163403463
+
         textView = (TextView) findViewById(R.id.headertext);
         imageView = (ImageView) findViewById(R.id.imageViewavt);
         ParseAnalytics.trackAppOpened(getIntent());
         cd = new ConnectionDetector(getApplicationContext());
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        //currentUser.getClass();
-        if (currentUser == null) {
+//        ParseUser currentUser = ParseUser.getCurrentUser();
+//        //currentUser.getClass();
+//        if (currentUser == null) {
+//
+//            navigatToLogin();
+//
+//        } else {
+//            Log.i("login", currentUser.getUsername());
+//            String e = currentUser.getEmail();
+//            textView.setText(e);
+//
+//            ParseFile p = currentUser.getParseFile("ImageFile");
+//
+//            //Toast.makeText(this,"image"+p,Toast.LENGTH_LONG).show();
+//            byte[] file = new byte[0];
+//            try {
+//                file = p.getData();
+//                Bitmap image = BitmapFactory.decodeByteArray(file, 0, file.length);
+//                imageView.setImageBitmap(image);
+//            } catch (ParseException e1) {
+//                e1.printStackTrace();
+//            }
+//
+//
+//        }
 
-            navigatToLogin();
 
-        } else {
-            Log.i("login", currentUser.getUsername());
-            String e = currentUser.getEmail();
-            textView.setText(e);
-
-            ParseFile p = currentUser.getParseFile("ImageFile");
-
-            //Toast.makeText(this,"image"+p,Toast.LENGTH_LONG).show();
-            byte[] file = new byte[0];
-            try {
-                file = p.getData();
-                Bitmap image = BitmapFactory.decodeByteArray(file, 0, file.length);
-                imageView.setImageBitmap(image);
-            } catch (ParseException e1) {
-                e1.printStackTrace();
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.i("gcm:----","Token retrieved and sent to server! You can now use gcmsender to\n" +
+                            "        send downstream messages to this app");
+                   // mInformationTextView.setText(getString(R.string.gcm_send_message));
+                } else {
+                    //mInformationTextView.setText(getString(R.string.token_error_message));
+                    Log.i("gcm:----","An error occurred while either fetching the InstanceID token,\n" +
+                            "        sending the fetched token to the server or subscribing to the PubSub topic. Please try\n" +
+                            "        running the sample again.");
+                }
             }
+        };
 
-
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
         }
 
+       // startService();
 
 //        ParseObject testObject = new ParseObject("TestObject");
 //        testObject.put("foo", "bar");
@@ -194,7 +254,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onResume() {
         super.onResume();
         isInternetPresent = cd.isConnectingToInternet();
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
 
         if (isInternetPresent) {
             // Internet Connection is Present
@@ -209,6 +270,39 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
 
     }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+
+        super.onPause();
+    }
+
+//    private void startService() {
+//        Calendar calendar = Calendar.getInstance();
+//
+//        calendar.set(Calendar.MONTH, 6);
+//        calendar.set(Calendar.YEAR, 2013);
+//        calendar.set(Calendar.DAY_OF_MONTH, 13);
+//
+//        calendar.set(Calendar.HOUR_OF_DAY, 20);
+//        calendar.set(Calendar.MINUTE, 48);
+//        calendar.set(Calendar.SECOND, 0);
+//        calendar.set(Calendar.AM_PM, Calendar.PM);
+//
+//        long firstTime = SystemClock.elapsedRealtime();
+//        firstTime += 10 * 1000;
+//
+//        Intent myIntent = new Intent(this, MyReceiver.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
+//
+//        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+//        //alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
+//        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime,
+//                10 * 1000, pendingIntent);
+//
+//
+//    }
 
     private void navigatToLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
@@ -262,5 +356,21 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             fab.show();
         }
         return false;
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 }
