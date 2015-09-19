@@ -2,7 +2,6 @@ package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -173,11 +172,12 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
 
         mRecyclerView.setAdapter(mAdapternew);
 
+        mAdapternew.setOnItemClickListener(onItemClickListener);
+
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         return layout;
     }
-
 
 
     @Override
@@ -238,12 +238,30 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
     SimpleCursorRecyclerAdapter.OnItemClickListener onItemClickListener = new SimpleCursorRecyclerAdapter.OnItemClickListener() {
 
         @Override
-        public void onItemClick(View view, int position) {
+        public void onItemClick(View view, int position, Cursor cursor) {
             Intent transitionIntent = new Intent(getActivity(), SecondActivity.class);
-            String url = feedItemList.get(position).getThumbnail();
-            transitionIntent.putExtra("flag", url);
+            String title=null;
+            //String url = feedItemList.get(position).getThumbnail();
+            //cursor.moveToPrevious();
+           // cursor.move(position);
+            //int versionIndex = cursor.getColumnIndex(MyContract.MyEntry.COLUMN_IMAGE);
+
+            //Log.i("imageshiiiiiiii", "hi" + versionIndex);
+            //cursor.moveToFirst();
+            //cursor.moveToPosition(position);
+
+            if (cursor.moveToPosition(position)) {
+                title = cursor.getString(cursor.getColumnIndex(MyContract.MyEntry.COLUMN_IMAGE));
+
+            }
+//            int a=cursor.getInt(position);
+//            Toast.makeText(getActivity(),"pos"+a, Toast.LENGTH_LONG).show();
+//
+//            cursor.moveToPosition(a);
+//            final String versionName = cursor.getString(a);
+            transitionIntent.putExtra("flag",title );
             //startActivity(transitionIntent);
-            //Toast.makeText(getActivity(),"pos"+position,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), title+"pos" + position, Toast.LENGTH_LONG).show();
 
             ImageView placeImage = (ImageView) view.findViewById(R.id.placeImage);
             LinearLayout placeNameHolder = (LinearLayout) view.findViewById(R.id.placeNameHolder);

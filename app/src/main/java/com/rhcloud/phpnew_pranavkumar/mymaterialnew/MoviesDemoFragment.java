@@ -171,7 +171,7 @@ public class MoviesDemoFragment extends Fragment {
 
         @Override
         public void onItemClick(View view, int position) {
-            Intent transitionIntent = new Intent(getActivity(), MovieActivity.class);
+            Intent transitionIntent = new Intent(getActivity(), MovieNewTest.class);
             String url=feedMovieList.get(position).getMovieurl();
             Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
             transitionIntent.putExtra("flag", url);
