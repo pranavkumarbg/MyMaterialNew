@@ -2,6 +2,8 @@ package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,9 +30,14 @@ import android.widget.Toast;
 import com.rhcloud.phpnew_pranavkumar.mymaterialnew.adapters.SimpleCursorRecyclerAdapter;
 import com.rhcloud.phpnew_pranavkumar.mymaterialnew.data.MyContract;
 import com.rhcloud.phpnew_pranavkumar.mymaterialnew.sync.SyncAdapter;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.util.ArrayList;
 
@@ -55,6 +62,20 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
     Cursor c;
     Context context;
 
+
+    String[] mProjection =
+            {
+                    //MyContract.MyEntry._ID,    // Contract class constant for the _ID column name
+                    MyContract.MyEntry.COLUMN_IMAGE,   // Contract class constant for the word column name
+                    // Contract class constant for the locale column name
+            };
+
+    // Defines a string to contain the selection clause
+    String mSelectionClause = null;
+
+    // Initializes an array to contain selection arguments
+    String[] mSelectionArgs = {""};
+
     private Cursor mDetailCursor;
     private View mRootView;
     private int mPosition;
@@ -71,6 +92,8 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
 //    SpacesItemDecoration decoration;
 //    private boolean isListView;
     private ArrayList<FeedItem> feedItemList = new ArrayList<FeedItem>();
+    FeedItem item;
+
     CircleProgressView mCircleView;
 
     public DesignDemoFragment() {
@@ -96,19 +119,25 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
                 null);
 
         if (c.getCount() == 0) {
-            //insertData();
-            Log.i("insertdata", "insertdata");
-           // SyncAdapter.initializeSyncAdapter(getActivity());
-            SyncAdapter.syncImmediately(getActivity());
+            Log.i("my", "first time");
 
-            //insertdata();
+            //insertData();
+            //Log.i("insertdata", "insertdata");
+           // SyncAdapter.initializeSyncAdapter(getActivity());
+           // SyncAdapter.syncImmediately(getActivity());
+
+            new DownloadJSONAda().execute();
+
+            new DownloadJSON().execute();
+            //Log.i("my", "first time");
+
 
         }
         // initiale loader
 
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-        Log.i("actvity", "created");
+        Log.i("my", "second time");
     }
 
 
@@ -132,6 +161,7 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
 
         View layout = inflater.inflate(R.layout.fragment_grid_view, container, false);
 
+       // Log.i("my", "onviewcreated");
 
 
 //        progressBar=(ProgressBar)layout.findViewById(R.id.progressBar2);
@@ -163,16 +193,18 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
         // StaggeredGridLayoutManager mLayoutManager1 = new StaggeredGridLayoutManager(2,1);
         mRecyclerView.setLayoutManager(mStaggeredLayoutManager);
 
-
-        //new DownloadJSON().execute();
-
         mAdapternew = new SimpleCursorRecyclerAdapter(getActivity(), null, 0, CURSOR_LOADER_ID);
 
-
-
         mRecyclerView.setAdapter(mAdapternew);
-
         mAdapternew.setOnItemClickListener(onItemClickListener);
+
+
+        Log.i("my", "cursor adapter set");
+
+        // new DownloadJSON().execute();
+
+
+
 
        // getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
@@ -192,6 +224,9 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
 
 
        mAdapternew.swapCursor(data);
+
+      // mRecyclerView.setAdapter(mAdapternew);
+        //getActivity().getContentResolver().notifyChange();
        // mAdapternew.notifyDataSetChanged();
 
 
@@ -203,37 +238,6 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
     }
 
 
-
-
-
-    private class DownloadJSON extends AsyncTask<String, String, String> {
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-           // progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        public String doInBackground(String... params) {
-
-
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String args) {
-
-
-
-
-
-
-        }
-    }
 
     SimpleCursorRecyclerAdapter.OnItemClickListener onItemClickListener = new SimpleCursorRecyclerAdapter.OnItemClickListener() {
 
@@ -276,5 +280,256 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
         }
     };
 
+
+    private class DownloadJSON extends AsyncTask<String, String, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        public String doInBackground(String... params) {
+
+
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder().url("http://newjson-pranavkumar.rhcloud.com/GridViewJson")
+                    .build();
+
+
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+
+
+                json = response.body().string();
+
+
+                JSONObject reader = new JSONObject(json);
+                JSONArray jsonarray = reader.getJSONArray("images");
+
+                for (int i = 0; i < jsonarray.length(); i++)
+                {
+
+                    JSONObject jsonobject = jsonarray.getJSONObject(i);
+
+                    item = new FeedItem();
+
+                    item.setThumbnail(jsonobject.optString("image"));
+                    feedItemList.add(item);
+
+
+                }
+            } catch (JSONException e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            } catch (Exception e) {
+
+            }
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String args) {
+
+            if (args != null && !args.isEmpty()) {
+
+                mAdapter = new MyAdapter(getActivity(), feedItemList);
+
+              //  mAdapternew = new SimpleCursorRecyclerAdapter(getActivity(), null, 0, CURSOR_LOADER_ID);
+
+                mRecyclerView.setAdapter(mAdapter);
+                mAdapter.setOnItemClickListener(onItemClickListenernew);
+
+                Log.i("my", "list adapter set");
+
+            }
+            else
+            {
+                Toast.makeText(getActivity(), "no internet or server is down", Toast.LENGTH_LONG).show();
+
+            }
+
+
+        }
+    }
+
+
+    MyAdapter.OnItemClickListener onItemClickListenernew=new MyAdapter.OnItemClickListener()
+    {
+
+        @Override
+        public void onItemClick(View view, int position) {
+            Intent transitionIntent = new Intent(getActivity(), SecondActivity.class);
+            String url=feedItemList.get(position).getThumbnail();
+            //Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
+            transitionIntent.putExtra("flag", url);
+           // startActivity(transitionIntent);
+            //Toast.makeText(getActivity(),"clicked"+position+url,Toast.LENGTH_LONG).show();
+
+            ImageView placeImage = (ImageView) view.findViewById(R.id.placeImage);
+            LinearLayout placeNameHolder = (LinearLayout) view.findViewById(R.id.placeNameHolder);
+// 2
+            Pair<View, String> imagePair = Pair.create((View) placeImage, "tImage");
+            Pair<View, String> holderPair = Pair.create((View) placeNameHolder, "tNameHolder");
+// 3
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
+                    imagePair, holderPair);
+
+            ActivityCompat.startActivity(getActivity(), transitionIntent, options.toBundle());
+
+        }
+    };
+
+
+    private class DownloadJSONAda extends AsyncTask<String, String, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        public String doInBackground(String... params) {
+
+            OkHttpClient okHttpClient = new OkHttpClient();
+            Request request = new Request.Builder().url("http://newjson-pranavkumar.rhcloud.com/GridViewJson")
+                    .build();
+
+
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+
+
+                json = response.body().string();
+
+                // String p=json.getClass().getName();
+                Object jsonn = new JSONTokener(json).nextValue();
+                if (jsonn instanceof JSONObject)
+                {
+                    Log.i("class","object"+jsonn.toString());
+
+                }
+                //you have an object
+                else if (jsonn instanceof JSONArray)
+                //you have an array
+                {
+                    Log.i("class","array"+jsonn.toString());
+                }
+
+                JSONObject reader = new JSONObject(json);
+                JSONArray jsonarray = reader.getJSONArray("images");
+
+                for (int i = 0; i < jsonarray.length(); i++)
+                {
+
+                    JSONObject jsonobject = jsonarray.getJSONObject(i);
+
+                    item = new FeedItem();
+
+                    item.setThumbnail(jsonobject.optString("image"));
+                    feedItemList.add(item);
+
+                    // String h=jsonobject.optString("image");
+                    //Log.i("images-json",h);
+
+
+                    String s = item.getThumbnail();
+
+                    //Log.i("images-feeditem",s);
+                    mSelectionClause = MyContract.MyEntry.COLUMN_IMAGE + " = ?";
+
+                    // Moves the user's input string to the selection arguments.
+                    mSelectionArgs[0] = s;
+
+
+                    Cursor mCursor = getActivity().getContentResolver().query(
+                            MyContract.MyEntry.CONTENT_URI,  // The content URI of the words table
+                            mProjection,                       // The columns to return for each row
+                            mSelectionClause,                  // Either null, or the word the user entered
+                            mSelectionArgs,                    // Either empty, or the string the user entered
+                            null);                       // The sort order for the returned rows
+
+                    // Some providers return null if an error occurs, others throw an exception
+                    if (null == mCursor) {
+
+                        // If the Cursor is empty, the provider found no matches
+
+                        ContentValues[] flavorValuesArr = new ContentValues[feedItemList.size()];
+                        // Loop through static array of Flavors, add each to an instance of ContentValues
+                        // in the array of ContentValues
+
+                        // Log.i("imagesffff", "");
+                        for (int j = 0; j < feedItemList.size(); j++) {
+                            FeedItem sk = feedItemList.get(j);
+                            Log.i("images", sk.getThumbnail());
+                            flavorValuesArr[j] = new ContentValues();
+                            flavorValuesArr[j].put(MyContract.MyEntry.COLUMN_IMAGE, sk.getThumbnail());
+
+                            Log.i("images", "iterating" + flavorValuesArr[i]);
+                            // getApplication().getContentResolver().insert(MyContract.MyEntry.CONTENT_URI,flavorValuesArr[i]);
+
+
+                        }
+
+                        getActivity().getContentResolver().bulkInsert(MyContract.MyEntry.CONTENT_URI, flavorValuesArr);
+                        //notifyme();
+
+
+
+
+
+                    } else if (mCursor.getCount() < 1) {
+
+
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(MyContract.MyEntry.COLUMN_IMAGE, s);
+                        getActivity().getContentResolver().insert(MyContract.MyEntry.CONTENT_URI, contentValues);
+
+
+
+                        Log.i("servicei", "inserted new record");
+                        //cursor.close();
+
+
+                        //notifyme();
+
+//                    final LayoutInflater mInflater = LayoutInflater.from(getContext());
+//                    final View sView = mInflater.inflate(R.layout.newcard, null, false);
+//                    RecyclerView mRecyclerView = (RecyclerView) sView.findViewById(R.id.recyclerview);
+//
+//                    SimpleCursorRecyclerAdapter mAdapternew = new SimpleCursorRecyclerAdapter(getContext(), null, 0, 0);
+//
+//                    mRecyclerView.setAdapter(mAdapternew);
+
+
+                    } else {
+                        // Insert code here to do something with the results
+                        Log.i("service", "record is present");
+                        // cursor.close();
+                    }
+
+
+                }
+
+            } catch (JSONException e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            } catch (Exception e) {
+
+            }
+
+        return null;
+        }
+
+        @Override
+        protected void onPostExecute(String args) {
+
+
+        }
+    }
 
 }

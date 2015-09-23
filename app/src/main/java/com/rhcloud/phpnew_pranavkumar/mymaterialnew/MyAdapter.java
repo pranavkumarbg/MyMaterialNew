@@ -58,11 +58,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 //                    .playOn(holder.placeImage);
             //Glide.with(mContext).load(url).centerCrop().into(holder.placeImage);
 
-            String s="http://2.bp.blogspot.com/-6oNTuKj2y1I/VDW1uaZUu3I/AAAAAAAALDc/tJM0s5p1-5o/s1600/Untitled-1.jpg";
+           // String s="http://2.bp.blogspot.com/-6oNTuKj2y1I/VDW1uaZUu3I/AAAAAAAALDc/tJM0s5p1-5o/s1600/Untitled-1.jpg";
 
 
             Glide.with(mContext)
-                    .load(s)
+                    .load(url)
                     .asBitmap()
                    // .diskCacheStrategy(DiskCacheStrategy.ALL)
                     //.thumbnail(0.1f)
@@ -120,7 +120,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             placeName = (TextView) itemView.findViewById(R.id.placeName);
             placeNameHolder = (LinearLayout) itemView.findViewById(R.id.placeNameHolder);
             placeImage = (ImageView) itemView.findViewById(R.id.placeImage);
-           // progressBar=(ProgressBar)itemView.findViewById(R.id.image_details_loader_new);
+            progressBar=(ProgressBar)itemView.findViewById(R.id.image_details_loader_new);
             placeHolder.setOnClickListener(this);
 
         }
