@@ -201,7 +201,7 @@
                             android:padding="12dp"
                             style="?android:attr/borderlessButtonStyle"
                             android:text="send"
-
+                            android:id="@+id/buttondown"
                             android:background="@color/accent"/>
                     </com.andexert.library.RippleView>
 

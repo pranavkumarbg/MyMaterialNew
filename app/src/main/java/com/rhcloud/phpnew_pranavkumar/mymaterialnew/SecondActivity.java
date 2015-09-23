@@ -11,14 +11,17 @@ import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.rhcloud.phpnew_pranavkumar.mymaterialnew.gcm.RegistrationIntentService;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -30,6 +33,7 @@ public class SecondActivity extends AppCompatActivity {
     ImageView imageView;
     String flag;
     ProgressBar loader;
+    Button b;
     private PhotoViewAttacher photoViewAttacher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,7 @@ public class SecondActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_second);
 
+        b=(Button)findViewById(R.id.buttondown);
         //progressBar=(ProgressBar)findViewById(R.id.progressBarsecact);
         //progressBar.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -51,6 +56,14 @@ public class SecondActivity extends AppCompatActivity {
 
         flag= i.getStringExtra("flag");
 
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), FileDownloadService.class);
+                startService(intent);
+                Toast.makeText(getApplicationContext(),"service started",Toast.LENGTH_LONG).show();
+            }
+        });
         //new StartActivity().execute();
 
         //Glide.with(this).load(flag).into(imageView);

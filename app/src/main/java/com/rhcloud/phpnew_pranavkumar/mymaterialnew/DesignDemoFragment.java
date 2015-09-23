@@ -106,7 +106,7 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
         }
         // initiale loader
 
-       // getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         Log.i("actvity", "created");
     }
@@ -174,7 +174,7 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
 
         mAdapternew.setOnItemClickListener(onItemClickListener);
 
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+       // getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         return layout;
     }
