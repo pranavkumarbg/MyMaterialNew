@@ -48,5 +48,6 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.8'
     compile fileTree(dir: 'libs', include: 'MAL-v1.2.0.jar')
     compile 'at.aau.itec.android.mediaplayer:mediaplayer:1.4.3'
+    compile fileTree(dir: 'libs', include: 'exoplayer.jar')
 
 }

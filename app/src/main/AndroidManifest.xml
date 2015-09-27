@@ -13,6 +13,9 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS"/>
+
     <permission
         android:name="com.rhcloud.phpnew_pranavkumar.mymaterialnew.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -70,7 +73,9 @@
         <activity
             android:name=".NewMovie"
             android:screenOrientation="landscape" />
+        <activity android:name=".MovieSecondActivity"/>
 
+        <activity android:name=".PlayerActivity"/>
 
         <provider
             android:name=".data.MyProvider"
@@ -156,6 +161,8 @@
         <service
             android:name=".FileDownloadService"
             android:exported="false" />
+        <service android:name=".MovieDownloadService"
+            android:exported="false"/>
     </application>
 
 </manifest>

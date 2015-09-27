@@ -1,8 +1,11 @@
 package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
+import android.app.WallpaperManager;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -10,6 +13,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,7 +25,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.rhcloud.phpnew_pranavkumar.mymaterialnew.gcm.RegistrationIntentService;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Random;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -33,7 +41,7 @@ public class SecondActivity extends AppCompatActivity {
     ImageView imageView;
     String flag;
     ProgressBar loader;
-    Button b;
+    Button b,b1;
     private PhotoViewAttacher photoViewAttacher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +49,8 @@ public class SecondActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_second);
 
-        b=(Button)findViewById(R.id.buttondown);
+        b=(Button)findViewById(R.id.btn_save);
+        b1=(Button)findViewById(R.id.btn_set);
         //progressBar=(ProgressBar)findViewById(R.id.progressBarsecact);
         //progressBar.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -60,6 +69,7 @@ public class SecondActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), FileDownloadService.class);
+                intent.putExtra("image",flag);
                 startService(intent);
                 Toast.makeText(getApplicationContext(),"service started",Toast.LENGTH_LONG).show();
             }
@@ -68,7 +78,13 @@ public class SecondActivity extends AppCompatActivity {
 
         //Glide.with(this).load(flag).into(imageView);
 
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MybitmapDownloaderTask().execute(flag);
 
+            }
+        });
 
         Glide.with(getApplicationContext())
                 .load(flag)
@@ -133,22 +149,14 @@ public class SecondActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-//                photoViewAttacher = new PhotoViewAttacher(imageView);
-//                photoViewAttacher.setZoomable(true);
-//                photoViewAttacher.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
                 Intent transitionIntent = new Intent(SecondActivity.this, ThirdActivity.class);
 
                 transitionIntent.putExtra("flaghh", flag);
-                //startActivity(transitionIntent);
-                //Toast.makeText(getActivity(),"pos"+position,Toast.LENGTH_LONG).show();
 
-                //ImageView placeImage = (ImageView) v.findViewById(R.id.imagesec);
-                //LinearLayout placeNameHolder = (LinearLayout)v.findViewById(R.id.placeNameHolderkk);
-// 2
                 Pair<View, String> imagePair = Pair.create((View) imageView, "tImage");
                 Pair<View, String> holderPair = Pair.create((View) placeNameHolder, "tNameHolder");
-// 3
+
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(SecondActivity.this,
                         imagePair, holderPair);
                 ActivityCompat.startActivity(SecondActivity.this, transitionIntent, options.toBundle());
@@ -159,35 +167,7 @@ public class SecondActivity extends AppCompatActivity {
 
     }
 
-    private class StartActivity extends AsyncTask<String,String,String>
-    {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //progressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-            Glide.with(SecondActivity.this).load(flag).into(imageView);
-
-           // progressBar.setVisibility(View.GONE);
-
-        }
-    }
 
     private void showLoader() {
         loader.animate().alpha(1.0f).setDuration(300).start();
@@ -196,6 +176,72 @@ public class SecondActivity extends AppCompatActivity {
     private void hideLoader() {
         loader.animate().alpha(0.0f).setDuration(300).start();
     }
+
+
+    class MybitmapDownloaderTask extends AsyncTask<String, Void, Bitmap> {
+        private String url;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //spinner.setVisibility(View.VISIBLE);
+            loader.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            url = params[0];
+            return DownloadUtil.downloadBitmap(url);
+        }
+
+        /**
+         * Once the image is downloaded, associates it to the imageView
+         */
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            // get the height and width of screen
+            int height = metrics.heightPixels;
+            int width = metrics.widthPixels;
+            // Retrieve a WallpaperManager
+            WallpaperManager myWallpaperManager = WallpaperManager.getInstance(SecondActivity.this);
+            try {
+                myWallpaperManager.setBitmap(bitmap);
+
+//                File root = Environment.getExternalStorageDirectory();
+//                File file = new File(root.getAbsolutePath()+"/saved_images");
+//                // File myDir=new File("/sdcard/saved_images");
+//                file.mkdirs();
+//                Random generator = new Random();
+//                int n = 10000;
+//                n = generator.nextInt(n);
+//                String fname = "Image-"+ n +".jpg";
+//                File file1= new File(file, fname);
+//                if (file1.exists ()) file1.delete ();
+//                try {
+//                    FileOutputStream out = new FileOutputStream(file1);
+//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+//                    out.flush();
+//                    out.close();
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            myWallpaperManager.suggestDesiredDimensions(height, width);
+
+
+            loader.setVisibility(View.GONE);
+           // spinner.setVisibility(View.GONE);
+            // Show a toast message on successful change
+            Toast.makeText(SecondActivity.this, "Wallpaper successfully changed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 
 }

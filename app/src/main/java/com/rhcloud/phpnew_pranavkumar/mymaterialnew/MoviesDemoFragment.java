@@ -171,12 +171,20 @@ public class MoviesDemoFragment extends Fragment {
 
         @Override
         public void onItemClick(View view, int position) {
-            Intent transitionIntent = new Intent(getActivity(), MovieNewTest.class);
-            String url=feedMovieList.get(position).getMovieurl();
-            Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
-            transitionIntent.putExtra("flag", url);
-            startActivity(transitionIntent);
+//            Intent transitionIntent = new Intent(getActivity(), MovieNewTest.class);
+//           String url=feedMovieList.get(position).getMovieurl();
+//            Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
+//            transitionIntent.putExtra("flag", url);
+//            startActivity(transitionIntent);
             //Toast.makeText(getActivity(),"clicked"+position+url,Toast.LENGTH_LONG).show();
+
+            Intent transitionIntent = new Intent(getActivity(), MovieSecondActivity.class);
+            String url=feedMovieList.get(position).getMovieurl();
+            String image=feedMovieList.get(position).getMoviethumbnail();
+            //Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
+            transitionIntent.putExtra("flagurl", url);
+            transitionIntent.putExtra("flagimage",image);
+            startActivity(transitionIntent);
 
         }
     };
