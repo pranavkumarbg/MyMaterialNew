@@ -163,14 +163,23 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
                 switch (menuItem.getItemId()) {
                     case R.id.navigation_item_attachment:
-                        Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+
+                        Intent intent = new Intent(MainActivity.this, AboutUs.class);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+
                         break;
                     case R.id.navigation_item_images:
-                        Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+
+                        Intent intentv = new Intent(MainActivity.this, ContactUs.class);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intentv);
                         break;
-                    case R.id.navigation_item_location:
-                        Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
-                        break;
+
 
                 }
 
@@ -333,8 +342,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 return true;
             case R.id.action_settings:
 
-                ParseUser.logOut();
-                navigatToLogin();
+                //ParseUser.logOut();
+                //navigatToLogin();
 
                 return true;
         }
