@@ -55,6 +55,7 @@ public class SecondActivity extends AppCompatActivity {
         //progressBar.setVisibility(View.GONE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setLogo(R.mipmap.pop);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         loader = (ProgressBar) findViewById(R.id.image_details_loader);
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);

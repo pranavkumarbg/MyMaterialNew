@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_action);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
+        toolbar.setLogo(R.mipmap.pop);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
