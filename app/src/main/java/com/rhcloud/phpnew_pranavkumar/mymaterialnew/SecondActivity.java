@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -22,9 +23,14 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,61 +93,109 @@ public class SecondActivity extends AppCompatActivity {
             }
         });
 
-        Glide.with(getApplicationContext())
-                .load(flag)
-
-                .fitCenter()
-                .listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e,
-                                               String model,
-                                               Target<GlideDrawable> target,
-                                               boolean isFirstResource) {
-                        hideLoader();
-                        //TODO: maybe show a retry button?
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource,
-                                                   String model,
-                                                   Target<GlideDrawable> target,
-                                                   boolean isFromMemoryCache,
-                                                   boolean isFirstResource) {
-
-                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-//                        renderTags(
-//                                ((GlideBitmapDrawable) resource.getCurrent())
-//                                        .getBitmap()
-//                        );
-//                        renderColors(
-//                                ((GlideBitmapDrawable) resource.getCurrent())
-//                                        .getBitmap()
-//                        );
-//                        imageView.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View view) {
-//                                //toggleZoomImage();
+//        Glide.with(getApplicationContext())
+//                .load(flag)
 //
-//                                //Toast.makeText(getApplicationContext(),"clicked image",Toast.LENGTH_LONG).show();
+//                .fitCenter()
+//                .listener(new RequestListener<String, GlideDrawable>() {
+//                    @Override
+//                    public boolean onException(Exception e,
+//                                               String model,
+//                                               Target<GlideDrawable> target,
+//                                               boolean isFirstResource) {
+//                        hideLoader();
+//                        //TODO: maybe show a retry button?
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean onResourceReady(GlideDrawable resource,
+//                                                   String model,
+//                                                   Target<GlideDrawable> target,
+//                                                   boolean isFromMemoryCache,
+//                                                   boolean isFirstResource) {
+//
+//                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//                        Bitmap bitmap=(GlideBitmapDrawable) resource.getCurrent().getBitmap();
+//
+//
+//                        Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener() {
+//                            @Override
+//                            public void onGenerated(Palette palette) {
+//
+//                                int mutedLight = palette.getVibrantColor(getResources().getColor(android.R.color.black));
+//                                placeNameHolder.setBackgroundColor(mutedLight);
 //                            }
 //                        });
-                        hideLoader();
-
-//                        Size size = fitToWidthAndKeepRatio(
-//                                imagePage.getImageWidth(),
-//                                imagePage.getImageHeight()
-//                        );
+////                        renderTags(
+////                                ((GlideBitmapDrawable) resource.getCurrent())
+////                                        .getBitmap()
+////                        );
+////                        renderColors(
+////                                ((GlideBitmapDrawable) resource.getCurrent())
+////                                        .getBitmap()
+////                        );
+////                        imageView.setOnClickListener(new View.OnClickListener() {
+////                            @Override
+////                            public void onClick(View view) {
+////                                //toggleZoomImage();
+////
+////                                //Toast.makeText(getApplicationContext(),"clicked image",Toast.LENGTH_LONG).show();
+////                            }
+////                        });
+//                        hideLoader();
 //
-//                        imageSize = size;
+////                        Size size = fitToWidthAndKeepRatio(
+////                                imagePage.getImageWidth(),
+////                                imagePage.getImageHeight()
+////                        );
+////
+////                        imageSize = size;
+//
+//
+//
+//                        return false;
+//                    }
+//                })
+//                .into(imageView);
+
+
+        Glide.with(this)
+                .load(flag)
+                .asBitmap()
+                        // .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        //.thumbnail(0.1f)
+                .into(new BitmapImageViewTarget(imageView) {
+
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation glideAnimation) {
+                        super.onResourceReady(resource, glideAnimation);
+
+
+//                        YoYo.with(Techniques.ZoomIn)
+//                                .duration(200)
+//                                .playOn(imageView);
 
 
 
-                        return false;
+                        Palette.generateAsync(resource, new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(Palette palette) {
+
+                                int mutedLight = palette.getVibrantColor(getResources().getColor(android.R.color.black));
+                                placeNameHolder.setBackgroundColor(mutedLight);
+                                b.setBackgroundColor(mutedLight);
+                                b1.setBackgroundColor(mutedLight);
+                            }
+                        });
+
+
+                      hideLoader();
+
+
                     }
-                })
-                .into(imageView);
+                });
+
 
 
 

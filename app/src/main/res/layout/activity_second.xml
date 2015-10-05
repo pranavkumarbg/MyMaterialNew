@@ -7,7 +7,7 @@
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="350dp"
         android:fitsSystemWindows="true"
         android:id="@+id/appbar"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -117,15 +117,13 @@
                         android:id="@+id/more2"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-
                         rv_centered="true">
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/btn_save"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"
-                        android:padding="12dp"
-
+                        android:background="@color/accent"
                         android:text="save"
                         />
                     </com.andexert.library.RippleView>
@@ -133,17 +131,15 @@
                         android:id="@+id/more1"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-
                         rv_centered="true">
                     <android.support.v7.widget.AppCompatButton
                         android:id="@+id/btn_set"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         style="?android:attr/borderlessButtonStyle"
-                        android:padding="12dp"
-
+                        android:background="@color/accent"
                         android:text="set as wall"
-                        />
+                        android:layout_marginTop="10dp"/>
                     </com.andexert.library.RippleView>
                     <!--<android.support.design.widget.TextInputLayout-->
                         <!--android:layout_width="match_parent"-->
@@ -174,9 +170,10 @@
                     android:padding="16dp">
 
                 <RatingBar
-                    android:layout_width="300dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:numStars="5"/>
 
                     <!--<Button-->
                         <!--android:layout_width="wrap_content"-->

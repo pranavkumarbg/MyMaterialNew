@@ -73,8 +73,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                         super.onResourceReady(resource, glideAnimation);
 
 
-                        YoYo.with(Techniques.Pulse)
-                                .duration(1000)
+                        YoYo.with(Techniques.ZoomIn)
+                                .duration(200)
                                 .playOn(holder.placeImage);
                         Palette.generateAsync(resource, new Palette.PaletteAsyncListener() {
                             @Override

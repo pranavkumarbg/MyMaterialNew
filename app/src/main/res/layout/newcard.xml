@@ -29,6 +29,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:visibility="visible"
+            android:indeterminateTint="@color/primary_dark"
             android:progressDrawable="@drawable/circular_progress_bar"
             style="?android:attr/progressBarStyleSmall"/>
 

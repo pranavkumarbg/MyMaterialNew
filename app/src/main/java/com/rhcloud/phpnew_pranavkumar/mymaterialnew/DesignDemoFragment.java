@@ -265,7 +265,7 @@ public class DesignDemoFragment extends Fragment implements  android.support.v4.
 //            final String versionName = cursor.getString(a);
             transitionIntent.putExtra("flag",title );
             //startActivity(transitionIntent);
-            Toast.makeText(getActivity(), title+"pos" + position, Toast.LENGTH_LONG).show();
+           // Toast.makeText(getActivity(), title+"pos" + position, Toast.LENGTH_LONG).show();
 
             ImageView placeImage = (ImageView) view.findViewById(R.id.placeImage);
             LinearLayout placeNameHolder = (LinearLayout) view.findViewById(R.id.placeNameHolder);
