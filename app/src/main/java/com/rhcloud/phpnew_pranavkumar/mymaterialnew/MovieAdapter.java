@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,15 +29,17 @@ import java.util.List;
 /**
  * Created by Pranav on 8/14/2015.
  */
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> implements Filterable {
 
     private List<MovieData> feedMovieList = new ArrayList<MovieData>();
+    private List<MovieData> feedMovieListnew = new ArrayList<MovieData>();
     private Context mContext;
     OnItemClickListener mItemClickListener;
 
     public MovieAdapter(Context applicationContext, ArrayList<MovieData> feedMovieList) {
         this.feedMovieList = feedMovieList;
         this.mContext = applicationContext;
+        feedMovieListnew=feedMovieList;
 
     }
 
@@ -116,6 +120,57 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return feedMovieList.size();
     }
 
+    @Override
+    public Filter getFilter() {
+        Filter filter = new Filter() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                feedMovieListnew= (ArrayList<MovieData>) results.values;
+                //notifyDataSetChanged();
+                MovieAdapter movieAdapter=new MovieAdapter(mContext, (ArrayList<MovieData>) feedMovieListnew);
+                movieAdapter.notifyDataSetChanged();
+               //mRecyclerView.setAdapter(mAdapter);
+                Log.i("kk","changes"+feedMovieListnew);
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                ArrayList<MovieData> FilteredList= new ArrayList<MovieData>();
+                if (constraint == null || constraint.length() == 0) {
+                    // No filter implemented we return all the list
+                    results.values = feedMovieList;
+                    results.count = feedMovieList.size();
+                }
+                else {
+                    for (int i = 0; i < feedMovieList.size(); i++) {
+                        String mname = feedMovieList.get(i).getMoviename();
+
+
+                        if (mname.toLowerCase().contains(constraint.toString()))  {
+
+                            Log.i("found",constraint.toString());
+                            MovieData item1 = new MovieData();
+
+                            item1.setMoviename(feedMovieList.get(i).getMoviename());
+                            item1.setMoviethumbnail(feedMovieList.get(i).getMoviethumbnail());
+                            item1.setMovieurl(feedMovieList.get(i).getMovieurl());
+
+                            FilteredList.add(item1);
+                        }
+                    }
+                    results.values = FilteredList;
+                    results.count = FilteredList.size();
+                }
+                return results;
+            }
+        };
+        return filter;
+    }
+
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 
@@ -153,6 +208,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
+
+
+
 
 }
 

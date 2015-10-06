@@ -1,5 +1,6 @@
 package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.Filter;
 
 /**
  * Created by Pranav on 9/2/2015.
@@ -41,7 +44,10 @@ public class MoviesDemoFragment extends Fragment {
     String b;
     String json;
     MovieData item;
+    SearchView searchView;
     private ArrayList<MovieData> feedMovieList = new ArrayList<MovieData>();
+
+    private ArrayList<MovieData> feedMovieListnext = new ArrayList<MovieData>();
 
     public MoviesDemoFragment() {
 
@@ -73,6 +79,8 @@ public class MoviesDemoFragment extends Fragment {
 
         View layout = inflater.inflate(R.layout.fragment_movie, container, false);
 
+        searchView = (SearchView) layout.findViewById(R.id.search);
+
         new DownloadJSON().execute();
 
         mRecyclerView = (RecyclerView) layout.findViewById(R.id.recyclerviewk);
@@ -84,15 +92,78 @@ public class MoviesDemoFragment extends Fragment {
         // StaggeredGridLayoutManager mLayoutManager1 = new StaggeredGridLayoutManager(2,1);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Toast.makeText(MainActivity.this, R.string.submitted, Toast.LENGTH_SHORT).show();
+                //se oculta el EditText
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
 
+                //mAdapter.getFilter().filter(newText);
+               // mRecyclerView.setAdapter(mAdapter);
+
+                if (newText == null || newText.length() == 0) {
+
+                    feedMovieListnext=feedMovieList;
+                    mAdapter = new MovieAdapter(getActivity(), feedMovieList);
+
+                    mRecyclerView.setAdapter(mAdapter);
+                    mAdapter.setOnItemClickListener(onItemClickListener);
+                }
+                else {
+                    for (int i = 0; i < feedMovieList.size(); i++) {
+                        if (feedMovieList.get(i).getMoviename().toLowerCase().contains(newText)) {
+                            //setDescription(values.getString(i));
+                            //Toast.makeText(getActivity(), "found", Toast.LENGTH_SHORT).show();
+                            MovieData item1 = new MovieData();
+                            ArrayList<MovieData> feedMovieListnew = new ArrayList<MovieData>();
+
+                            item1.setMoviename(feedMovieList.get(i).getMoviename());
+                            item1.setMoviethumbnail(feedMovieList.get(i).getMoviethumbnail());
+                            item1.setMovieurl(feedMovieList.get(i).getMovieurl());
+
+                            feedMovieListnew.add(item1);
+                            feedMovieListnext=feedMovieListnew;
+
+                            mAdapter = new MovieAdapter(getActivity(), feedMovieListnew);
+
+                            mRecyclerView.setAdapter(mAdapter);
+                            mAdapter.setOnItemClickListener(onItemClickListener);
+
+
+                        } else {
+                            //Toast.makeText(getActivity(), "not found", Toast.LENGTH_SHORT).show();
+
+//                            mAdapter = new MovieAdapter(getActivity(), feedMovieList);
+//
+//                            mRecyclerView.setAdapter(mAdapter);
+//                            mAdapter.setOnItemClickListener(onItemClickListener);
+
+                        }
+                    }
+                }
+
+                return true;
+            }
+        });
 
         return layout;
     }
+
+
 
     @Override
     public void onResume() {
         super.onResume();
     }
+
+
+
 
     private class DownloadJSON extends AsyncTask<String, String, String> {
 
@@ -149,6 +220,7 @@ public class MoviesDemoFragment extends Fragment {
 
             if (args != null && !args.isEmpty()) {
 
+                feedMovieListnext=feedMovieList;
                 mAdapter = new MovieAdapter(getActivity(), feedMovieList);
 
                 mRecyclerView.setAdapter(mAdapter);
@@ -179,8 +251,10 @@ public class MoviesDemoFragment extends Fragment {
             //Toast.makeText(getActivity(),"clicked"+position+url,Toast.LENGTH_LONG).show();
 
             Intent transitionIntent = new Intent(getActivity(), MovieSecondActivity.class);
-            String url=feedMovieList.get(position).getMovieurl();
-            String image=feedMovieList.get(position).getMoviethumbnail();
+
+
+            String url=feedMovieListnext.get(position).getMovieurl();
+            String image=feedMovieListnext.get(position).getMoviethumbnail();
             //Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
             transitionIntent.putExtra("flagurl", url);
             transitionIntent.putExtra("flagimage",image);
