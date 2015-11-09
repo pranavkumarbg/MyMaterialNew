@@ -2,6 +2,7 @@ package com.rhcloud.phpnew_pranavkumar.mymaterialnew;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -82,9 +85,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 //        Sender ID help
 //        82163403463
 
+
         textView = (TextView) findViewById(R.id.headertext);
         imageView = (ImageView) findViewById(R.id.imageViewavt);
-        ParseAnalytics.trackAppOpened(getIntent());
+        //ParseAnalytics.trackAppOpened(getIntent());
         cd = new ConnectionDetector(getApplicationContext());
 //        ParseUser currentUser = ParseUser.getCurrentUser();
 //        //currentUser.getClass();
@@ -235,6 +239,36 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 viewPager.setCurrentItem(tab.getPosition());
 
 
+                isInternetPresent = cd.isConnectingToInternet();
+                LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mRegistrationBroadcastReceiver,
+                        new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+
+                if (isInternetPresent) {
+                    // Internet Connection is Present
+                    // make HTTP requests
+
+                } else {
+                    // Internet connection is not present
+                    // Ask user to connect to Internet
+                   // Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG).show();
+
+                    Snackbar snackbar= Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG);
+
+                    ViewGroup viewGroup=(ViewGroup)snackbar.getView();
+                    for(int i=0;i<viewGroup.getChildCount();i++)
+                    {
+                        View v=viewGroup.getChildAt(i);
+                        if(v instanceof TextView)
+                        {
+                            TextView textView=(TextView)v;
+                            textView.setTextColor(R.color.white);
+
+                        }
+
+                    }
+                    snackbar.show();
+
+                }
                 int t=tab.getPosition();
                 //int k=tabLayout.getSelectedTabPosition();
 
@@ -255,6 +289,35 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
+                isInternetPresent = cd.isConnectingToInternet();
+                LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mRegistrationBroadcastReceiver,
+                        new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+
+                if (isInternetPresent) {
+                    // Internet Connection is Present
+                    // make HTTP requests
+
+                } else {
+                    // Internet connection is not present
+                    // Ask user to connect to Internet
+                    //Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG).show();
+
+                    Snackbar snackbar= Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG);
+
+                    ViewGroup viewGroup=(ViewGroup)snackbar.getView();
+                    for(int i=0;i<viewGroup.getChildCount();i++)
+                    {
+                        View v=viewGroup.getChildAt(i);
+                        if(v instanceof TextView)
+                        {
+                            TextView textView=(TextView)v;
+                            textView.setTextColor(R.color.accent);
+
+                        }
+
+                    }
+                    snackbar.show();
+                }
             }
         });
     }
@@ -273,8 +336,23 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         } else {
             // Internet connection is not present
             // Ask user to connect to Internet
-            Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG).show();
+            //Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG).show();
 
+            Snackbar snackbar= Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG);
+
+            ViewGroup viewGroup=(ViewGroup)snackbar.getView();
+            for(int i=0;i<viewGroup.getChildCount();i++)
+            {
+                View v=viewGroup.getChildAt(i);
+                if(v instanceof TextView)
+                {
+                    TextView textView=(TextView)v;
+                    textView.setTextColor(R.color.white);
+
+                }
+
+            }
+            snackbar.show();
         }
 
 
@@ -325,6 +403,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -355,6 +440,37 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     public boolean onTouch(View view, MotionEvent motionEvent) {
         int c = viewPager.getCurrentItem();
 
+
+        isInternetPresent = cd.isConnectingToInternet();
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+
+        if (isInternetPresent) {
+            // Internet Connection is Present
+            // make HTTP requests
+
+        } else {
+            // Internet connection is not present
+            // Ask user to connect to Internet
+            //Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG).show();
+
+            Snackbar snackbar= Snackbar.make(findViewById(R.id.coordinator), "Hi No Internet Connection", Snackbar.LENGTH_LONG);
+
+            ViewGroup viewGroup=(ViewGroup)snackbar.getView();
+            for(int i=0;i<viewGroup.getChildCount();i++)
+            {
+                View v=viewGroup.getChildAt(i);
+                if(v instanceof TextView)
+                {
+                    TextView textView=(TextView)v;
+                    textView.setTextColor(R.color.white);
+
+                }
+
+            }
+            snackbar.show();
+
+        }
         //int k=tabLayout.getSelectedTabPosition();
 
         // Toast.makeText(this,"id"+k,Toast.LENGTH_LONG).show();

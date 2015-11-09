@@ -83,7 +83,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
             Picasso.with(mContext)
                     .load(url)
-                    .fit().centerCrop()
                     .transform(PaletteTransformation.instance())
                     .into(holder.placeImage, new Callback.EmptyCallback() {
                         @Override public void onSuccess() {
