@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
 //        Server API Key help
 //        AIzaSyBFKpI_76IDa0PsyuLy9JIExYCtFJSEHm8
 //        Sender ID help
@@ -399,7 +400,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
@@ -409,7 +411,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
-
+        searchView.setSubmitButtonEnabled(true);
         return true;
     }
 
