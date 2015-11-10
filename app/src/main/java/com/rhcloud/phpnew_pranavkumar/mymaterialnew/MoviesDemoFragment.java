@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -55,6 +56,7 @@ public class MoviesDemoFragment extends Fragment {
     private ArrayList<MovieData> feedMovieList = new ArrayList<MovieData>();
 
     private ArrayList<MovieData> feedMovieListnext = new ArrayList<MovieData>();
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
 
     public MoviesDemoFragment() {
 
@@ -100,17 +102,31 @@ public class MoviesDemoFragment extends Fragment {
 
         progressBar=(ProgressBar)layout.findViewById(R.id.progressmovie);
 
-        if (isNetworkAvailable(getActivity())) {
+//        if (isNetworkAvailable(getActivity())) {
             // code here
             new DownloadJSON().execute();
-        } else {
-            // code
+//        } else {
+//            // code
+//
+//            //Toast.makeText(getActivity(), "check internet connection", Toast.LENGTH_LONG).show();
+//
+//        }
 
-            //Toast.makeText(getActivity(), "check internet connection", Toast.LENGTH_LONG).show();
+        mSwipeRefreshLayout = (SwipeRefreshLayout)layout. findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //Refreshing data on server
+                feedMovieList.clear();
+                new DownloadJSON().execute();
 
-        }
+            }
+        });
 
-
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         mRecyclerView = (RecyclerView) layout.findViewById(R.id.recyclerviewk);
         mRecyclerView.setHasFixedSize(true);
 
@@ -332,6 +348,9 @@ public class MoviesDemoFragment extends Fragment {
 
                 mRecyclerView.setAdapter(mAdapter);
 
+            if (mSwipeRefreshLayout.isRefreshing()) {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
                 mAdapter.setOnItemClickListener(onItemClickListener);
                 //Toast.makeText(getActivity(), "done", Toast.LENGTH_LONG).show();
 

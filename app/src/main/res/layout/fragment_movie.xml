@@ -28,11 +28,18 @@
         android:indeterminateTint="@color/primary_dark"
         android:progressDrawable="@drawable/circular_progress_bar"
         style="?android:attr/progressBarStyleSmall"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <android.support.v7.widget.RecyclerView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/recyclerviewk"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
        />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>
